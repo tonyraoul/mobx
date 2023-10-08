@@ -25,7 +25,7 @@ type ObserverAdministration = {
 }
 
 function createReaction(adm: ObserverAdministration) {
-    adm.reaction = new Reaction(`observer${adm.name}`, () => {
+    return new Reaction(`observer${adm.name}`, () => {
         adm.stateVersion = Symbol()
         // onStoreChange won't be available until the component "mounts".
         // If state changes in between initial render and mount,
@@ -58,7 +58,7 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
                     // 2. React "re-mounts" same component without calling render in between (typically <StrictMode>).
                     // We have to recreate reaction and schedule re-render to recreate subscriptions,
                     // even if state did not change.
-                    createReaction(adm)
+                    adm.reaction = createReaction(adm)
                     // `onStoreChange` won't force update if subsequent `getSnapshot` returns same value.
                     // So we make sure that is not the case
                     adm.stateVersion = Symbol()
@@ -84,14 +84,14 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
 
     if (!adm.reaction) {
         // First render or reaction was disposed by registry before subscribe
-        createReaction(adm)
+        adm.reaction = createReaction(adm)
         // StrictMode/ConcurrentMode/Suspense may mean that our component is
         // rendered and abandoned multiple times, so we need to track leaked
         // Reactions.
         observerFinalizationRegistry.register(admRef, adm, adm)
     }
 
-    React.useDebugValue(adm.reaction!, printDebugValue)
+    React.useDebugValue(adm.reaction, printDebugValue)
 
     useSyncExternalStore(
         // Both of these must be stable, otherwise it would keep resubscribing every render.
@@ -105,7 +105,7 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
     // can be invalidated (see above) once a dependency changes
     let renderResult!: T
     let exception
-    adm.reaction!.track(() => {
+    adm.reaction.track(() => {
         try {
             renderResult = render()
         } catch (e) {
