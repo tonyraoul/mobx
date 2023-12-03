@@ -11,7 +11,8 @@ import {
     propagateChanged,
     reportObserved,
     startBatch,
-    Lambda
+    Lambda,
+    MobXTypes
 } from "../internal"
 
 export const $mobx = Symbol("mobx administration")
@@ -22,6 +23,7 @@ export interface IAtom extends IObservable {
 }
 
 export class Atom implements IAtom {
+    mobxType = MobXTypes.ATOM
     isPendingUnobservation_ = false // for effective unobserving. BaseAtom has true, for extra optimization, so its onBecomeUnobserved never gets called, because it's not needed
     isBeingObserved_ = false
     observers_ = new Set<IDerivation>()
@@ -74,7 +76,7 @@ export class Atom implements IAtom {
     }
 }
 
-export const isAtom = createInstanceofPredicate("Atom", Atom)
+export const isAtom = createInstanceofPredicate("Atom", MobXTypes.ATOM, Atom)
 
 export function createAtom(
     name: string,

@@ -28,7 +28,8 @@ import {
     ADD,
     die,
     isFunction,
-    initObservable
+    initObservable,
+    MobXTypes
 } from "../internal"
 
 const ObservableSetMarker = {}
@@ -65,6 +66,7 @@ export type ISetWillChange<T = any> =
 
 export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillChange>, IListenable {
     [$mobx] = ObservableSetMarker
+    mobxType = MobXTypes.OBSERVABLE_SET
     private data_: Set<any> = new Set()
     atom_!: IAtom
     changeListeners_
@@ -292,6 +294,6 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
 }
 
 // eslint-disable-next-line
-export var isObservableSet = createInstanceofPredicate("ObservableSet", ObservableSet) as (
+export var isObservableSet = createInstanceofPredicate("ObservableSet", MobXTypes.OBSERVABLE_SET, ObservableSet) as (
     thing: any
 ) => thing is ObservableSet<any>

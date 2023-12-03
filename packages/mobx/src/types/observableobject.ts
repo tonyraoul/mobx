@@ -47,7 +47,8 @@ import {
     getDebugName,
     objectPrototype,
     MakeResult,
-    checkIfStateModificationsAreAllowed
+    checkIfStateModificationsAreAllowed,
+    MobXTypes
 } from "../internal"
 
 const descriptorCache = Object.create(null)
@@ -91,6 +92,7 @@ const REMOVE = "remove"
 export class ObservableObjectAdministration
     implements IInterceptable<IObjectWillChange>, IListenable
 {
+    mobxType = MobXTypes.OBSERVABLE_OBJECT_ADMINISTRATION
     keysAtom_: IAtom
     changeListeners_
     interceptors_
@@ -695,6 +697,7 @@ export function asObservableObject(
 
 const isObservableObjectAdministration = createInstanceofPredicate(
     "ObservableObjectAdministration",
+    MobXTypes.OBSERVABLE_OBJECT_ADMINISTRATION,
     ObservableObjectAdministration
 )
 

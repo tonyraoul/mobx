@@ -17,6 +17,17 @@ export interface Lambda {
     name?: string
 }
 
+export enum MobXTypes {
+    ATOM = 1,
+    COMPUTED_VALUE,
+    REACTION,
+    OBSERVABLE_MAP,
+    OBSERVABLE_SET,
+    OBSERVABLE_VALUE,
+    OBSERVABLE_ARRAY_ADMINISTRATION,
+    OBSERVABLE_OBJECT_ADMINISTRATION,
+}
+
 const hasProxy = typeof Proxy !== "undefined"
 const plainObjectString = Object.toString()
 
@@ -131,10 +142,12 @@ export function addHiddenFinalProp(object: any, propName: PropertyKey, value: an
 
 export function createInstanceofPredicate<T>(
     name: string,
+    type: MobXTypes,
     theClass: new (...args: any[]) => T
 ): (x: any) => x is T {
     const propName = "isMobX" + name
     theClass.prototype[propName] = true
+    theClass.prototype.mobxType = type
     return function (x) {
         return isObject(x) && x[propName] === true
     } as any
