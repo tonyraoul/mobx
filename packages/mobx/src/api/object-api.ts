@@ -6,12 +6,11 @@ import {
     ObservableSet,
     ObservableObjectAdministration,
     endBatch,
-    isObservableArray,
-    isObservableMap,
     isObservableSet,
     isObservableObject,
     startBatch,
-    die
+    die,
+    MobXTypes
 } from "../internal"
 
 export function keys<K>(map: ObservableMap<K, any>): ReadonlyArray<K>
@@ -19,15 +18,14 @@ export function keys<T>(ar: IObservableArray<T>): ReadonlyArray<number>
 export function keys<T>(set: ObservableSet<T>): ReadonlyArray<T>
 export function keys<T extends Object>(obj: T): ReadonlyArray<PropertyKey>
 export function keys(obj: any): any {
-    if (isObservableObject(obj)) {
+    switch(obj?.mobxType) {
+      case MobXTypes.OBSERVABLE_OBJECT_ADMINISTRATION:
         return (
             (obj as any as IIsObservableObject)[$mobx] as ObservableObjectAdministration
         ).keys_()
-    }
-    if (isObservableMap(obj) || isObservableSet(obj)) {
+      case MobXTypes.OBSERVABLE_MAP:
         return Array.from(obj.keys())
-    }
-    if (isObservableArray(obj)) {
+      case MobXTypes.OBSERVABLE_ARRAY_ADMINISTRATION:
         return obj.map((_, index) => index)
     }
     die(5)
@@ -38,17 +36,15 @@ export function values<T>(set: ObservableSet<T>): ReadonlyArray<T>
 export function values<T>(ar: IObservableArray<T>): ReadonlyArray<T>
 export function values<T = any>(obj: T): ReadonlyArray<T extends object ? T[keyof T] : any>
 export function values(obj: any): string[] {
-    if (isObservableObject(obj)) {
-        return keys(obj).map(key => obj[key])
-    }
-    if (isObservableMap(obj)) {
-        return keys(obj).map(key => obj.get(key))
-    }
-    if (isObservableSet(obj)) {
-        return Array.from(obj.values())
-    }
-    if (isObservableArray(obj)) {
-        return obj.slice()
+    switch(obj?.mobxType) {
+        case MobXTypes.OBSERVABLE_OBJECT_ADMINISTRATION:
+          return keys(obj).map(key => obj[key])
+        case MobXTypes.OBSERVABLE_MAP:
+          return keys(obj).map(key => obj.get(key))
+        case MobXTypes.OBSERVABLE_SET:
+            return Array.from(obj.values())
+        case MobXTypes.OBSERVABLE_ARRAY_ADMINISTRATION:
+            return obj.slice()
     }
     die(6)
 }
@@ -60,17 +56,15 @@ export function entries<T = any>(
     obj: T
 ): ReadonlyArray<[string, T extends object ? T[keyof T] : any]>
 export function entries(obj: any): any {
-    if (isObservableObject(obj)) {
-        return keys(obj).map(key => [key, obj[key]])
-    }
-    if (isObservableMap(obj)) {
-        return keys(obj).map(key => [key, obj.get(key)])
-    }
-    if (isObservableSet(obj)) {
-        return Array.from(obj.entries())
-    }
-    if (isObservableArray(obj)) {
-        return obj.map((key, index) => [index, key])
+    switch(obj?.mobxType) {
+        case MobXTypes.OBSERVABLE_OBJECT_ADMINISTRATION:
+            return keys(obj).map(key => [key, obj[key]])
+        case MobXTypes.OBSERVABLE_MAP:
+            return keys(obj).map(key => [key, obj.get(key)])
+        case MobXTypes.OBSERVABLE_SET:
+            return Array.from(obj.entries())
+        case MobXTypes.OBSERVABLE_ARRAY_ADMINISTRATION:
+            return obj.map((key, index) => [index, key])
     }
     die(7)
 }
@@ -94,27 +88,32 @@ export function set(obj: any, key: any, value?: any): void {
         }
         return
     }
-    if (isObservableObject(obj)) {
-        ;(obj as any as IIsObservableObject)[$mobx].set_(key, value)
-    } else if (isObservableMap(obj)) {
-        obj.set(key, value)
-    } else if (isObservableSet(obj)) {
-        obj.add(key)
-    } else if (isObservableArray(obj)) {
-        if (typeof key !== "number") {
-            key = parseInt(key, 10)
-        }
-        if (key < 0) {
-            die(`Invalid index: '${key}'`)
-        }
-        startBatch()
-        if (key >= obj.length) {
-            obj.length = key + 1
-        }
-        obj[key] = value
-        endBatch()
-    } else {
-        die(8)
+    switch(obj?.mobxType) {
+        case MobXTypes.OBSERVABLE_OBJECT_ADMINISTRATION:
+            ;(obj as any as IIsObservableObject)[$mobx].set_(key, value)
+            break;
+        case MobXTypes.OBSERVABLE_MAP:
+            obj.set(key, value)
+            break;
+        case MobXTypes.OBSERVABLE_SET:
+            obj.add(key)
+            break;
+        case MobXTypes.OBSERVABLE_ARRAY_ADMINISTRATION:
+            if (typeof key !== "number") {
+                key = parseInt(key, 10)
+            }
+            if (key < 0) {
+                die(`Invalid index: '${key}'`)
+            }
+            startBatch()
+            if (key >= obj.length) {
+                obj.length = key + 1
+            }
+            obj[key] = value
+            endBatch()
+            break;
+        default:
+            die(8)
     }
 }
 
@@ -123,19 +122,22 @@ export function remove<T>(obj: ObservableSet<T>, key: T)
 export function remove<T>(obj: IObservableArray<T>, index: number)
 export function remove<T extends Object>(obj: T, key: string)
 export function remove(obj: any, key: any): void {
-    if (isObservableObject(obj)) {
-        ;(obj as any as IIsObservableObject)[$mobx].delete_(key)
-    } else if (isObservableMap(obj)) {
-        obj.delete(key)
-    } else if (isObservableSet(obj)) {
-        obj.delete(key)
-    } else if (isObservableArray(obj)) {
-        if (typeof key !== "number") {
-            key = parseInt(key, 10)
-        }
-        obj.splice(key, 1)
-    } else {
-        die(9)
+    switch(obj?.mobxType) {
+        case MobXTypes.OBSERVABLE_OBJECT_ADMINISTRATION:
+            ;(obj as any as IIsObservableObject)[$mobx].delete_(key)
+            break;
+        case MobXTypes.OBSERVABLE_MAP:
+        case MobXTypes.OBSERVABLE_SET:
+            obj.delete(key)
+            break;
+        case MobXTypes.OBSERVABLE_ARRAY_ADMINISTRATION:
+            if (typeof key !== "number") {
+                key = parseInt(key, 10)
+            }
+            obj.splice(key, 1)
+            break;
+        default:
+            die(9)
     }
 }
 
@@ -144,14 +146,15 @@ export function has<T>(obj: ObservableSet<T>, key: T): boolean
 export function has<T>(obj: IObservableArray<T>, index: number): boolean
 export function has<T extends Object>(obj: T, key: string): boolean
 export function has(obj: any, key: any): boolean {
-    if (isObservableObject(obj)) {
-        return (obj as any as IIsObservableObject)[$mobx].has_(key)
-    } else if (isObservableMap(obj)) {
-        return obj.has(key)
-    } else if (isObservableSet(obj)) {
-        return obj.has(key)
-    } else if (isObservableArray(obj)) {
-        return key >= 0 && key < obj.length
+    switch(obj?.mobxType) {
+        case MobXTypes.OBSERVABLE_OBJECT_ADMINISTRATION:
+            return (obj as any as IIsObservableObject)[$mobx].has_(key)
+        case MobXTypes.OBSERVABLE_MAP:
+            return obj.has(key)
+        case  MobXTypes.OBSERVABLE_SET:
+            return obj.has(key)
+        case MobXTypes.OBSERVABLE_ARRAY_ADMINISTRATION:
+            return key >= 0 && key < obj.length
     }
     die(10)
 }
@@ -163,11 +166,12 @@ export function get(obj: any, key: any): any {
     if (!has(obj, key)) {
         return undefined
     }
-    if (isObservableObject(obj)) {
+    switch (obj?.mobxType) {
+      case MobXTypes.OBSERVABLE_OBJECT_ADMINISTRATION:
         return (obj as any as IIsObservableObject)[$mobx].get_(key)
-    } else if (isObservableMap(obj)) {
+      case MobXTypes.OBSERVABLE_MAP:
         return obj.get(key)
-    } else if (isObservableArray(obj)) {
+      case MobXTypes.OBSERVABLE_ARRAY_ADMINISTRATION:
         return obj[key]
     }
     die(11)

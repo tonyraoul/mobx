@@ -722,6 +722,10 @@ export function isObservableObject(thing: any): boolean {
     return false
 }
 
+export function isObservableObjectFast(thing: {}): boolean {
+    return thing['mobxType'] === MobXTypes.OBSERVABLE_OBJECT_ADMINISTRATION
+}
+
 export function recordAnnotationApplied(
     adm: ObservableObjectAdministration,
     annotation: Annotation,
