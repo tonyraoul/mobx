@@ -23,7 +23,7 @@ export function getAtom(thing: any, property?: PropertyKey): IDepTreeNode {
             thing[property]
         } // See #1072
         switch(thing.mobxType) {
-            case MobXTypes.OBSERVABLE_ARRAY_ADMINISTRATION:
+            case MobXTypes.OBSERVABLE_ARRAY:
                 if (property !== undefined) {
                     die(23)
                 }
@@ -39,7 +39,7 @@ export function getAtom(thing: any, property?: PropertyKey): IDepTreeNode {
                     die(25, property, getDebugName(thing))
                 }
                 return observable
-            case MobXTypes.OBSERVABLE_OBJECT_ADMINISTRATION: {
+            case MobXTypes.OBSERVABLE_OBJECT: {
                 if (!property) {
                     return die(26)
                 }

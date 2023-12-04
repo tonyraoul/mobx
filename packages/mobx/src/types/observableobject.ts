@@ -92,7 +92,7 @@ const REMOVE = "remove"
 export class ObservableObjectAdministration
     implements IInterceptable<IObjectWillChange>, IListenable
 {
-    mobxType = MobXTypes.OBSERVABLE_OBJECT_ADMINISTRATION
+    mobxType = MobXTypes.OBSERVABLE_OBJECT
     keysAtom_: IAtom
     changeListeners_
     interceptors_
@@ -722,7 +722,7 @@ export function isObservableObject(thing: any): boolean {
 }
 
 export function isObservableObjectFast(thing: {}): boolean {
-    return thing['mobxType'] === MobXTypes.OBSERVABLE_OBJECT_ADMINISTRATION
+    return thing['mobxType'] === MobXTypes.OBSERVABLE_OBJECT
 }
 
 export function recordAnnotationApplied(

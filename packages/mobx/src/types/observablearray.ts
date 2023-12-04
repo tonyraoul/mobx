@@ -119,7 +119,7 @@ const arrayTraps = {
 export class ObservableArrayAdministration
     implements IInterceptable<IArrayWillChange<any> | IArrayWillSplice<any>>, IListenable
 {
-    mobxType = MobXTypes.OBSERVABLE_ARRAY_ADMINISTRATION
+    mobxType = MobXTypes.OBSERVABLE_ARRAY
     atom_: IAtom
     readonly values_: any[] = [] // this is the prop that gets proxied, so can't replace it!
     interceptors_
