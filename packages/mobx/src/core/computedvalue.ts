@@ -334,4 +334,4 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     }
 }
 
-export const isComputedValue = createInstanceofPredicate("ComputedValue", MobXTypes.COMPUTED_VALUE, ComputedValue)
+export const isComputedValue = createInstanceofPredicate("ComputedValue", ComputedValue)

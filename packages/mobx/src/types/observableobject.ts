@@ -697,7 +697,6 @@ export function asObservableObject(
 
 const isObservableObjectAdministration = createInstanceofPredicate(
     "ObservableObjectAdministration",
-    MobXTypes.OBSERVABLE_OBJECT_ADMINISTRATION,
     ObservableObjectAdministration
 )
 

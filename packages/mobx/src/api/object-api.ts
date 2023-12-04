@@ -24,6 +24,7 @@ export function keys(obj: any): any {
             (obj as any as IIsObservableObject)[$mobx] as ObservableObjectAdministration
         ).keys_()
       case MobXTypes.OBSERVABLE_MAP:
+      case MobXTypes.OBSERVABLE_SET:
         return Array.from(obj.keys())
       case MobXTypes.OBSERVABLE_ARRAY_ADMINISTRATION:
         return obj.map((_, index) => index)
@@ -150,8 +151,7 @@ export function has(obj: any, key: any): boolean {
         case MobXTypes.OBSERVABLE_OBJECT_ADMINISTRATION:
             return (obj as any as IIsObservableObject)[$mobx].has_(key)
         case MobXTypes.OBSERVABLE_MAP:
-            return obj.has(key)
-        case  MobXTypes.OBSERVABLE_SET:
+        case MobXTypes.OBSERVABLE_SET:
             return obj.has(key)
         case MobXTypes.OBSERVABLE_ARRAY_ADMINISTRATION:
             return key >= 0 && key < obj.length

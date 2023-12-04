@@ -294,6 +294,6 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
 }
 
 // eslint-disable-next-line
-export var isObservableSet = createInstanceofPredicate("ObservableSet", MobXTypes.OBSERVABLE_SET, ObservableSet) as (
+export var isObservableSet = createInstanceofPredicate("ObservableSet", ObservableSet) as (
     thing: any
 ) => thing is ObservableSet<any>

@@ -487,7 +487,7 @@ export class ObservableMap<K = any, V = any>
 }
 
 // eslint-disable-next-line
-export var isObservableMap = createInstanceofPredicate("ObservableMap", MobXTypes.OBSERVABLE_MAP, ObservableMap) as (
+export var isObservableMap = createInstanceofPredicate("ObservableMap", ObservableMap) as (
     thing: any
 ) => thing is ObservableMap<any, any>
 

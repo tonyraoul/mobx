@@ -76,7 +76,7 @@ export class Atom implements IAtom {
     }
 }
 
-export const isAtom = createInstanceofPredicate("Atom", MobXTypes.ATOM, Atom)
+export const isAtom = createInstanceofPredicate("Atom", Atom)
 
 export function createAtom(
     name: string,

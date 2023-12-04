@@ -269,7 +269,7 @@ function runReactionsHelper() {
     globalState.isRunningReactions = false
 }
 
-export const isReaction = createInstanceofPredicate("Reaction", MobXTypes.REACTION, Reaction)
+export const isReaction = createInstanceofPredicate("Reaction", Reaction)
 
 export function setReactionScheduler(fn: (f: () => void) => void) {
     const baseScheduler = reactionScheduler

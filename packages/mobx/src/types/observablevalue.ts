@@ -196,6 +196,6 @@ export class ObservableValue<T>
     }
 }
 
-export const isObservableValue = createInstanceofPredicate("ObservableValue", MobXTypes.OBSERVABLE_VALUE, ObservableValue) as (
+export const isObservableValue = createInstanceofPredicate("ObservableValue", ObservableValue) as (
     x: any
 ) => x is IObservableValue<any>

@@ -594,7 +594,6 @@ function reduceLikeFunc(funcName) {
 
 const isObservableArrayAdministration = createInstanceofPredicate(
     "ObservableArrayAdministration",
-    MobXTypes.OBSERVABLE_ARRAY_ADMINISTRATION,
     ObservableArrayAdministration
 )
 
