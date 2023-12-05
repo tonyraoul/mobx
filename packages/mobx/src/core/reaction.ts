@@ -18,7 +18,7 @@ import {
     spyReportStart,
     startBatch,
     trace,
-    trackDerivedFunction, GenericAbortSignal
+    trackDerivedFunction, GenericAbortSignal, MobXTypes
 } from "../internal"
 
 /**
@@ -51,6 +51,7 @@ export interface IReactionDisposer {
 }
 
 export class Reaction implements IDerivation, IReactionPublic {
+    mobxType = MobXTypes.REACTION
     observing_: IObservable[] = [] // nodes we are looking at. Our value depends on these nodes
     newObserving_: IObservable[] = []
     dependenciesState_ = IDerivationState_.NOT_TRACKING_

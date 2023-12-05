@@ -4,7 +4,6 @@ import {
     IDepTreeNode,
     isAtom,
     isComputedValue,
-    isObservableArray,
     isObservableMap,
     isObservableObject,
     isReaction,
@@ -19,42 +18,57 @@ import {
     endBatch
 } from "../internal"
 
+export enum MobXTypes {
+    ATOM = 1,
+    COMPUTED_VALUE,
+    REACTION,
+    OBSERVABLE_MAP,
+    OBSERVABLE_SET,
+    OBSERVABLE_VALUE,
+    OBSERVABLE_ARRAY,
+    OBSERVABLE_OBJECT,
+    OBSERVABLE_OBJECT_ADMINISTRATION,
+}
+
 export function getAtom(thing: any, property?: PropertyKey): IDepTreeNode {
-    if (typeof thing === "object" && thing !== null) {
-        if (isObservableArray(thing)) {
-            if (property !== undefined) {
-                die(23)
-            }
-            return (thing as any)[$mobx].atom_
-        }
-        if (isObservableSet(thing)) {
-            return thing.atom_
-        }
-        if (isObservableMap(thing)) {
-            if (property === undefined) {
-                return thing.keysAtom_
-            }
-            const observable = thing.data_.get(property) || thing.hasMap_.get(property)
-            if (!observable) {
-                die(25, property, getDebugName(thing))
-            }
-            return observable
-        }
+    if (typeof thing === "object" && thing != null) {
         if (property && !thing[$mobx]) {
             thing[property]
         } // See #1072
-        if (isObservableObject(thing)) {
-            if (!property) {
-                return die(26)
+        switch(thing[$mobx]?.mobxType || thing.mobxType) {
+            case MobXTypes.OBSERVABLE_ARRAY:
+                if (property !== undefined) {
+                    die(23)
+                }
+                return (thing as any)[$mobx].atom_
+            case MobXTypes.OBSERVABLE_SET:
+                return thing.atom_
+            case MobXTypes.OBSERVABLE_MAP:
+                if (property === undefined) {
+                    return thing.keysAtom_
+                }
+                const observable = thing.data_.get(property) || thing.hasMap_.get(property)
+                if (!observable) {
+                    die(25, property, getDebugName(thing))
+                }
+                return observable
+            case MobXTypes.OBSERVABLE_OBJECT_ADMINISTRATION:
+            case MobXTypes.OBSERVABLE_OBJECT: {
+                if (!property) {
+                    return die(26)
+                }
+                const observable = (thing as any)[$mobx].values_.get(property)
+                if (!observable) {
+                    die(27, property, getDebugName(thing))
+                }
+                return observable
             }
-            const observable = (thing as any)[$mobx].values_.get(property)
-            if (!observable) {
-                die(27, property, getDebugName(thing))
-            }
-            return observable
-        }
-        if (isAtom(thing) || isComputedValue(thing) || isReaction(thing)) {
-            return thing
+            case MobXTypes.OBSERVABLE_VALUE:
+            case MobXTypes.ATOM:
+            case MobXTypes.COMPUTED_VALUE:
+            case MobXTypes.REACTION:
+                return thing
+
         }
     } else if (isFunction(thing)) {
         if (isReaction(thing[$mobx])) {

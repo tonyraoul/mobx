@@ -35,7 +35,8 @@ import {
     UPDATE,
     IAtom,
     PureSpyEvent,
-    initObservable
+    initObservable,
+    MobXTypes
 } from "../internal"
 
 export interface IKeyValueMap<V = any> {
@@ -93,6 +94,7 @@ export class ObservableMap<K = any, V = any>
     implements Map<K, V>, IInterceptable<IMapWillChange<K, V>>, IListenable
 {
     [$mobx] = ObservableMapMarker
+    mobxType = MobXTypes.OBSERVABLE_MAP
     data_!: Map<K, ObservableValue<V>>
     hasMap_!: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
     keysAtom_!: IAtom

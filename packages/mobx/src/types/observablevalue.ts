@@ -23,7 +23,8 @@ import {
     toPrimitive,
     globalState,
     IUNCHANGED,
-    UPDATE
+    UPDATE,
+    MobXTypes
 } from "../internal"
 
 export interface IValueWillChange<T> {
@@ -61,6 +62,7 @@ export class ObservableValue<T>
     extends Atom
     implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable
 {
+    mobxType = MobXTypes.OBSERVABLE_VALUE
     hasUnreportedChange_ = false
     interceptors_
     changeListeners_

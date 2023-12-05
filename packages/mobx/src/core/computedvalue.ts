@@ -29,7 +29,8 @@ import {
     UPDATE,
     die,
     allowStateChangesStart,
-    allowStateChangesEnd
+    allowStateChangesEnd,
+    MobXTypes
 } from "../internal"
 
 export interface IComputedValue<T> {
@@ -76,6 +77,7 @@ export type IComputedDidChange<T = any> = {
  * If at any point it's outside batch and it isn't observed: reset everything and go to 1.
  */
 export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDerivation {
+    mobxType = MobXTypes.COMPUTED_VALUE
     dependenciesState_ = IDerivationState_.NOT_TRACKING_
     observing_: IObservable[] = [] // nodes we are looking at. Our value depends on these nodes
     newObserving_ = null // during tracking it's an array with new observed observers
