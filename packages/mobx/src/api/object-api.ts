@@ -11,7 +11,8 @@ import {
     isObservableSet,
     isObservableObject,
     startBatch,
-    die
+    die,
+    MobXTypes
 } from "../internal"
 
 export function keys<K>(map: ObservableMap<K, any>): ReadonlyArray<K>
@@ -38,17 +39,16 @@ export function values<T>(set: ObservableSet<T>): ReadonlyArray<T>
 export function values<T>(ar: IObservableArray<T>): ReadonlyArray<T>
 export function values<T = any>(obj: T): ReadonlyArray<T extends object ? T[keyof T] : any>
 export function values(obj: any): string[] {
-    if (isObservableObject(obj)) {
-        return keys(obj).map(key => obj[key])
-    }
-    if (isObservableMap(obj)) {
-        return keys(obj).map(key => obj.get(key))
-    }
-    if (isObservableSet(obj)) {
-        return Array.from(obj.values())
-    }
-    if (isObservableArray(obj)) {
-        return obj.slice()
+    switch(obj[$mobx]?.mobxType || obj.mobxType) {
+        case MobXTypes.OBSERVABLE_OBJECT_ADMINISTRATION:
+        case MobXTypes.OBSERVABLE_OBJECT:
+            return keys(obj).map(key => obj[key])
+        case MobXTypes.OBSERVABLE_MAP:
+            return keys(obj).map(key => obj.get(key))
+        case MobXTypes.OBSERVABLE_SET:
+            return Array.from(obj.values())
+        case MobXTypes.OBSERVABLE_ARRAY:
+            return obj.slice()
     }
     die(6)
 }
