@@ -31,11 +31,10 @@ export enum MobXTypes {
 }
 
 export function getAtom(thing: any, property?: PropertyKey): IDepTreeNode {
-    if (typeof thing === "object" && thing != null) {
-        if (property && !thing[$mobx]) {
-            thing[property]
-        } // See #1072
-        switch(thing[$mobx]?.mobxType || thing.mobxType) {
+        // if (typeof thing === "object" && thing != null && property && !thing[$mobx]) {
+        //         thing[property]
+        // } // See #1072
+        switch(thing?.[$mobx]?.mobxType || thing?.mobxType) {
             case MobXTypes.OBSERVABLE_ARRAY:
                 if (property !== undefined) {
                     die(23)
@@ -66,16 +65,16 @@ export function getAtom(thing: any, property?: PropertyKey): IDepTreeNode {
             case MobXTypes.OBSERVABLE_VALUE:
             case MobXTypes.ATOM:
             case MobXTypes.COMPUTED_VALUE:
-            case MobXTypes.REACTION:
                 return thing
-
+            case MobXTypes.REACTION:
+                if (isFunction(thing)) {
+                    if (isReaction(thing[$mobx])) {
+                        // disposer function
+                        return thing[$mobx]
+                    }
+                }
+                return thing
         }
-    } else if (isFunction(thing)) {
-        if (isReaction(thing[$mobx])) {
-            // disposer function
-            return thing[$mobx]
-        }
-    }
     die(28)
 }
 
