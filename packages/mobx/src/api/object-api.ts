@@ -143,16 +143,18 @@ export function has<T>(obj: ObservableSet<T>, key: T): boolean
 export function has<T>(obj: IObservableArray<T>, index: number): boolean
 export function has<T extends Object>(obj: T, key: string): boolean
 export function has(obj: any, key: any): boolean {
-    if (isObservableObject(obj)) {
-        return (obj as any as IIsObservableObject)[$mobx].has_(key)
-    } else if (isObservableMap(obj)) {
-        return obj.has(key)
-    } else if (isObservableSet(obj)) {
-        return obj.has(key)
-    } else if (isObservableArray(obj)) {
-        return key >= 0 && key < obj.length
+    switch(obj[$mobx]?.mobxType || obj.mobxType) {
+        case MobXTypes.OBSERVABLE_OBJECT:
+        case MobXTypes.OBSERVABLE_OBJECT_ADMINISTRATION:
+            return (obj as any as IIsObservableObject)[$mobx].has_(key)
+        case MobXTypes.OBSERVABLE_MAP:
+        case MobXTypes.OBSERVABLE_SET:
+            return obj.has(key)
+        case MobXTypes.OBSERVABLE_ARRAY:
+            return key >= 0 && key < obj.length
+        default:
+            die(10)
     }
-    die(10)
 }
 
 export function get<K, V>(obj: ObservableMap<K, V>, key: K): V | undefined
@@ -162,14 +164,18 @@ export function get(obj: any, key: any): any {
     if (!has(obj, key)) {
         return undefined
     }
-    if (isObservableObject(obj)) {
-        return (obj as any as IIsObservableObject)[$mobx].get_(key)
-    } else if (isObservableMap(obj)) {
-        return obj.get(key)
-    } else if (isObservableArray(obj)) {
-        return obj[key]
+    switch(obj[$mobx]?.mobxType || obj.mobxType) {
+        case MobXTypes.OBSERVABLE_OBJECT:
+        case MobXTypes.OBSERVABLE_OBJECT_ADMINISTRATION:
+            return (obj as any as IIsObservableObject)[$mobx].get_(key)
+        case MobXTypes.OBSERVABLE_MAP:
+        case MobXTypes.OBSERVABLE_SET:
+            return obj.get(key)
+        case MobXTypes.OBSERVABLE_ARRAY:
+            return obj[key]
+        default:
+            die(11)
     }
-    die(11)
 }
 
 export function apiDefineProperty(obj: Object, key: PropertyKey, descriptor: PropertyDescriptor) {

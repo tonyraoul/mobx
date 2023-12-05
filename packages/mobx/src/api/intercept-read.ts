@@ -4,13 +4,11 @@ import {
     Lambda,
     ObservableMap,
     getAdministration,
-    isObservableArray,
-    isObservableMap,
-    isObservableObject,
-    isObservableValue,
     ObservableSet,
     die,
-    isStringish
+    isStringish,
+    $mobx,
+    MobXTypes
 } from "../internal"
 
 export type ReadInterceptor<T> = (value: any) => T
@@ -36,17 +34,25 @@ export function interceptReads(
 ): Lambda
 export function interceptReads(thing, propOrHandler?, handler?): Lambda {
     let target
-    if (isObservableMap(thing) || isObservableArray(thing) || isObservableValue(thing)) {
-        target = getAdministration(thing)
-    } else if (isObservableObject(thing)) {
-        if (__DEV__ && !isStringish(propOrHandler)) {
-            return die(
+    switch (thing[$mobx]?.mobxType || thing.mobxType) {
+        case MobXTypes.OBSERVABLE_MAP:
+        case MobXTypes.OBSERVABLE_ARRAY:
+        case MobXTypes.OBSERVABLE_VALUE:
+            target = getAdministration(thing)
+            break;
+        case MobXTypes.OBSERVABLE_OBJECT:
+        case MobXTypes.OBSERVABLE_OBJECT_ADMINISTRATION:
+            if (__DEV__ && !isStringish(propOrHandler)) {
+              return die(
                 `InterceptReads can only be used with a specific property, not with an object in general`
-            )
-        }
-        target = getAdministration(thing, propOrHandler)
-    } else if (__DEV__) {
-        return die(`Expected observable map, object or array as first array`)
+              )
+            }
+            target = getAdministration(thing, propOrHandler)
+            break;
+        default:
+            if (__DEV__) {
+                return die(`Expected observable map, object or array as first array`)
+            }
     }
     if (__DEV__ && target.dehancer !== undefined) {
         return die(`An intercept reader was already established`)
