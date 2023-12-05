@@ -60,17 +60,16 @@ export function entries<T = any>(
     obj: T
 ): ReadonlyArray<[string, T extends object ? T[keyof T] : any]>
 export function entries(obj: any): any {
-    if (isObservableObject(obj)) {
-        return keys(obj).map(key => [key, obj[key]])
-    }
-    if (isObservableMap(obj)) {
-        return keys(obj).map(key => [key, obj.get(key)])
-    }
-    if (isObservableSet(obj)) {
-        return Array.from(obj.entries())
-    }
-    if (isObservableArray(obj)) {
-        return obj.map((key, index) => [index, key])
+    switch(obj[$mobx]?.mobxType || obj.mobxType) {
+        case MobXTypes.OBSERVABLE_OBJECT_ADMINISTRATION:
+        case MobXTypes.OBSERVABLE_OBJECT:
+            return keys(obj).map(key => [key, obj[key]])
+        case MobXTypes.OBSERVABLE_MAP:
+            return keys(obj).map(key => [key, obj.get(key)])
+        case MobXTypes.OBSERVABLE_SET:
+            return Array.from(obj.entries())
+        case MobXTypes.OBSERVABLE_ARRAY:
+            return obj.map((key, index) => [index, key])
     }
     die(7)
 }
